@@ -1,8 +1,8 @@
 # 🛡️ Phishing Email Detection System
 
-A complete, beginner-friendly machine learning application that analyses email content and classifies each message as **🔴 Phishing** or **🟢 Safe (Legitimate)**.
+A complete, advanced machine learning application that analyses email content and classifies each message as **🔴 Phishing** or **🟢 Safe (Legitimate)**.
 
-Built with **Python, scikit-learn, pandas, Streamlit** and **Joblib**, featuring a modern cybersecurity dashboard, four compared ML algorithms, evaluation charts, and automated tests. Suitable for a college cybersecurity mini-project submission.
+Built with **Python, scikit-learn, pandas, Streamlit** and **Joblib**, featuring a modern cybersecurity dashboard, four base ML algorithms plus a soft-voting ensemble, evaluation charts, and automated tests. Suitable for a college cybersecurity mini-project submission.
 
 ---
 
@@ -156,7 +156,7 @@ The dataset (`data/dataset.csv`) contains three columns:
         |
         v
 9. Generate reports/ (confusion matrix, ROC/PR curves, model comparison,
-   permutation feature importance)
+   feature importance)
 ```
 
 ### Hand-crafted features (34 columns)
@@ -225,6 +225,8 @@ This installs: `scikit-learn`, `pandas`, `numpy`, `nltk`, `matplotlib`, `seaborn
 
 > **Python version:** 3.11 or newer recommended. This project was developed and tested on **Python 3.14.4**.
 
+> **Trained model not included:** `models/phishing_model.joblib` is ~115 MB, above GitHub's file-size limit, so it is generated locally. Run `python3 train.py` once before starting the app (section 9).
+
 ---
 
 ## 9. How to Train the Model
@@ -241,7 +243,8 @@ python train.py
 3. Trains Logistic Regression, Naive Bayes, Random Forest, Linear SVM
 4. Selects the best model by test-set F1-score
 5. Saves `models/phishing_model.joblib`
-6. Writes `reports/confusion_matrix.png` and `reports/model_comparison.png`
+6. Writes `reports/confusion_matrix.png`, `reports/model_comparison.png`,
+   `reports/roc_pr_curves.png` and `reports/feature_importance.png`
 7. Prints a comparison table and classification report
 
 You only need to run this once. The Streamlit app loads the saved model automatically.
@@ -412,7 +415,7 @@ Results below are **measured on the held-out 20% test set** (3,508 emails) — n
 * `confusion_matrix.png` — heatmap of true vs predicted classes
 * `roc_pr_curves.png` — ROC curve (AUC) and Precision-Recall curve (AP)
 * `model_comparison.png` — bar chart comparing all five configurations
-* `feature_importance.png` — top permutation-importance features
+* `feature_importance.png` — top features by Gini importance (Random Forest)
 
 > ⚠️ **No model achieves 100% accuracy.**
 > * **False positive:** a legitimate email flagged as phishing (inconvenience).
@@ -424,8 +427,8 @@ Results below are **measured on the held-out 20% test set** (3,508 emails) — n
 
 ## 14. Screenshots Section
 
-> Place screenshots of the running Streamlit app here (tab A–D) before submission.
->
+> Screenshots of the running dashboard can be saved here for a written report or presentation:
+
 | Tab | Suggested filename |
 |-----|--------------------|
 | Home Dashboard | `screenshots/home-dashboard.png` |
@@ -433,9 +436,11 @@ Results below are **measured on the held-out 20% test set** (3,508 emails) — n
 | Model Performance | `screenshots/model-performance.png` |
 | Dataset Information | `screenshots/dataset-info.png` |
 
-The `reports/` folder already contains:
+The `reports/` folder already contains generated evaluation charts:
 * `reports/confusion_matrix.png`
+* `reports/roc_pr_curves.png`
 * `reports/model_comparison.png`
+* `reports/feature_importance.png`
 
 ---
 
@@ -444,9 +449,9 @@ The `reports/` folder already contains:
 | Limitation | Possible improvement |
 |------------|----------------------|
 | Dataset phishing samples are heavily skewed toward adult/advertising-style content | Add more varied phishing samples (banking, CEO fraud, invoice scams) |
-| Single subject/body text; no email headers analysed | Add header analysis (SPF/DKIM, sender domain mismatch) |
+| Dataset provides body text only; dashboard header parsing is heuristic | Train on real header signals (SPF/DKIM/DMARC results, Received chain) |
 | No attachment or embedded-image scanning | Add attachment MIME-type checks and image OCR |
-| Confidence scores are model estimates, not guarantees | Calibrate probabilities (Platt scaling / isotonic regression) |
+| Confidence scores are calibrated estimates, not guarantees | Recalibrate on domain-specific mail and monitor for drift |
 | English-only stop words | Add multilingual support |
 | Static snapshot of data | Scheduled retraining on new labelled emails |
 
